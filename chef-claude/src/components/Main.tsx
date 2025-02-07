@@ -5,9 +5,15 @@ import { IngredientList } from "./IngredientList";
 import { getRecipeFromMistral } from "./ai.tsx";
 
 export default function Main() {
-  const [ingredients, setIngredients] = React.useState([]);
+  const [ingredients, setIngredients] = React.useState([
+    "ovo",
+    "frango",
+    "tomate",
+    "manjericão",
+  ]);
   const [recipeShown, setRecipeShown] = React.useState(false);
   const [recipe, setRecipe] = useState("");
+  const [loading, setLoading] = useState(false);
 
   function addIngredient(formData: any) {
     const newIngredient = formData.get("ingredient");
@@ -21,6 +27,10 @@ export default function Main() {
   async function showRecipe() {
     setRecipeShown((prevRecipe) => {
       return !prevRecipe;
+    });
+
+    setLoading((prevResult) => {
+      return !prevResult;
     });
 
     const recipeData = await getRecipeFromMistral(ingredients);
@@ -41,7 +51,7 @@ export default function Main() {
       {ingredients.length > 0 && (
         <IngredientList ingredients={ingredients} shownRecipe={showRecipe} />
       )}
-      {recipeShown && <Recipe recipe={recipe} />}
+      {recipeShown && <Recipe recipe={recipe} loading={loading} />}
     </main>
   );
 }
