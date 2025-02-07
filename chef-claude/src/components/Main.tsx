@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, { useState } from "react";
 import { Recipe } from "./Recipe";
 import { IngredientList } from "./IngredientList";
+import { getRecipeFromMistral } from "./ai.tsx";
 
 export default function Main() {
-  const [ingredients, setIngredients] = React.useState([
-    "all the main spices",
-    "pasta",
-    "ground beef",
-    "tomato paste",
-  ]);
+  const [ingredients, setIngredients] = React.useState([]);
   const [recipeShown, setRecipeShown] = React.useState(false);
+  const [recipe, setRecipe] = useState("");
 
   function addIngredient(formData: any) {
     const newIngredient = formData.get("ingredient");
@@ -21,10 +18,13 @@ export default function Main() {
     });
   }
 
-  function showRecipe() {
+  async function showRecipe() {
     setRecipeShown((prevRecipe) => {
       return !prevRecipe;
     });
+
+    const recipeData = await getRecipeFromMistral(ingredients);
+    setRecipe(recipeData ?? "No recipe found.");
   }
 
   return (
@@ -41,8 +41,7 @@ export default function Main() {
       {ingredients.length > 0 && (
         <IngredientList ingredients={ingredients} shownRecipe={showRecipe} />
       )}
-
-      {recipeShown && <Recipe />}
+      {recipeShown && <Recipe recipe={recipe} />}
     </main>
   );
 }
